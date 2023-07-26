@@ -1,6 +1,7 @@
-// #include "saver.h"
 
-void logFunc(const std::string & str)
+
+#include <sys/stat.h>
+inline void log(const std::string & str)
 {
     std::cout << str << std::endl;
 }
@@ -8,26 +9,28 @@ void logFunc(const std::string & str)
 template <typename T>
 void TreeSaver<T>::save(T * root)
 {
-    logFunc("starting save function");
+    log("starting save function");
+
     count = 0;
 
     if(!root)
     {
-        logFunc("Tree does NOT exist\nExiting...");
+        log("Tree does NOT exist\nExiting...");
         return;
     }
 
     // tree exists
 
+
     // first traversal for creating the map and storing the data of the nodes in nodes.dat file
-    logFunc("calling storeNodes function");
+    log("calling storeNodes function");
     storeNodes(root);
-    logFunc("storeNodes has returned");
+    log("storeNodes has returned");
 
     // but the children information still needs to be stored
-    logFunc("calling storeChildren function");
+    log("calling storeChildren function");
     storeChildren(root);
-    logFunc("storeChildren has returned");
+    log("storeChildren has returned");
 }
 
 template <typename T>
@@ -36,11 +39,11 @@ void TreeSaver<T>::storeNodes(T * root)
     std::ofstream fout; // for writing to "nodes" file
 
     // creating a hidden directory in the current directory to store both the files
-    fout.open("./.tree-saver-files/nodes.dat");
+    fout.open("nodes.dat");
 
     std::queue<T *> q; // for BFS
 
-    logFunc("starting first traversal");
+    log("starting first traversal");
 
     q.push(root);
 
@@ -62,7 +65,7 @@ void TreeSaver<T>::storeNodes(T * root)
         if(root->left) q.push(root->left);
         if(root->right) q.push(root->right);
     }
-    logFunc("first traversal done");
+    log("first traversal done");
     fout.close();
     return;
 }
@@ -73,8 +76,8 @@ void TreeSaver<T>::writeNode(std::ofstream & fout, T * nodeptr)
     T temp = *nodeptr;
 
     // won't store the actuall address in the file, just making them NULL
-    temp->left = NULL;
-    temp->right = NULL;
+    temp.left = NULL;
+    temp.right = NULL;
 
     fout.write((char * ) &temp, sizeof(temp) ); // all the data members of the OG node have been written to the hdd file nodes.dat
 }
@@ -88,11 +91,11 @@ void TreeSaver<T>::storeChildren(T * root)
 
     std::ofstream fout;
 
-    fout.open("./.tree-saver-files/children.dat"); // a hidden file
+    fout.open("children.dat"); // a hidden file
 
     std::queue<T *> q;
 
-    logFunc("starting second traversal");
+    log("starting second traversal");
 
     q.push(root);
 
@@ -128,7 +131,7 @@ void TreeSaver<T>::storeChildren(T * root)
             fout << lc << " " << rc << "\n";
         }
     }
-    logFunc("second traversal done");
+    log("second traversal done");
     fout.close();
 }
-void logFunc(const std::string &str) { std::cout << str << std::endl; }
+

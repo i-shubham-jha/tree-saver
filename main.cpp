@@ -1,4 +1,4 @@
-#include "./saver/saver.h"
+#include "tree-saver.h"
 
 struct Node
 {
@@ -10,9 +10,15 @@ struct Node
 int main ()
 {
     Node * root = new Node;
-    root->left = NULL;
     root->right = NULL;
     root->data = 0;
+
+    Node * n2 = new Node;
+    n2->left = NULL;
+    n2->right = NULL;
+    n2->data = 0;
+
+    root->left = n2;
 
     TreeSaver<Node> ob;
 
