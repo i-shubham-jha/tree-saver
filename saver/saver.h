@@ -28,6 +28,9 @@ template <typename T> class TreeSaver
     // number of nodes which have been saved
     int count;
 
+    // function to store the children information in the children.dat file
+    void storeChildren(T * root);
+
 public:
 
     // function to begin saving of the tree on hdd
