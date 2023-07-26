@@ -1,7 +1,6 @@
-#include "saver.h"
-#include <queue>
+// #include "saver.h"
 
-void log(const std::string & str)
+void logFunc(const std::string & str)
 {
     std::cout << str << std::endl;
 }
@@ -9,21 +8,26 @@ void log(const std::string & str)
 template <typename T>
 void TreeSaver<T>::save(T * root)
 {
+    logFunc("starting save function");
     count = 0;
 
     if(!root)
     {
-        log("Tree does NOT exist\nExiting...");
+        logFunc("Tree does NOT exist\nExiting...");
         return;
     }
 
     // tree exists
 
     // first traversal for creating the map and storing the data of the nodes in nodes.dat file
+    logFunc("calling storeNodes function");
     storeNodes(root);
+    logFunc("storeNodes has returned");
 
     // but the children information still needs to be stored
+    logFunc("calling storeChildren function");
     storeChildren(root);
+    logFunc("storeChildren has returned");
 }
 
 template <typename T>
@@ -36,34 +40,29 @@ void TreeSaver<T>::storeNodes(T * root)
 
     std::queue<T *> q; // for BFS
 
-    log("starting traversal of tree");
+    logFunc("starting first traversal");
 
     q.push(root);
 
     // standard BFS implementation
     while(!q.empty())
     {
-        int size = q.size();
+        root = q.front();
+        q.pop();
 
-        while(size--)
-        {
-            root = q.front();
-            q.pop();
+        count++; // one more node dealt with
 
-            count++; // one more node dealt with
+        // creating entries for this node in the map
+        hash.insert({root, count - 1}); // the index from BFS
 
-            // creating entries for this node in the map
-            hash.insert({root, count - 1}); // the index from BFS
+        // adding this (count-1) th node to the nodes.dat file
+        writeNode(fout, root );
 
-            // adding this (count-1) th node to the nodes.dat file
-            writeNode(fout, root );
-
-            // adding its children in the queue
-            if(root->left) q.push(root->left);
-            if(root->right) q.push(root->right);
-        }
+        // adding its children in the queue
+        if(root->left) q.push(root->left);
+        if(root->right) q.push(root->right);
     }
-    log("first traversal done");
+    logFunc("first traversal done");
     fout.close();
     return;
 }
@@ -93,7 +92,9 @@ void TreeSaver<T>::storeChildren(T * root)
 
     std::queue<T *> q;
 
-    q.push_back(root);
+    logFunc("starting second traversal");
+
+    q.push(root);
 
     // no need for knowing index of a node,
     // we are processing nodes in the same order so no need.
@@ -127,6 +128,7 @@ void TreeSaver<T>::storeChildren(T * root)
             fout << lc << " " << rc << "\n";
         }
     }
-    log("second traversal done");
+    logFunc("second traversal done");
     fout.close();
 }
+void logFunc(const std::string &str) { std::cout << str << std::endl; }
