@@ -11,8 +11,6 @@ void TreeSaver<T>::save(T * root)
 {
     log("starting save function");
 
-    count = 0;
-
     if(!root)
     {
         log("Tree does NOT exist\nExiting...");
@@ -20,32 +18,18 @@ void TreeSaver<T>::save(T * root)
     }
 
     // tree exists
+    // doing single level order traversal and storing nodes/children in respective files
 
-
-    // first traversal for creating the map and storing the data of the nodes in nodes.dat file
-    log("calling storeNodes function");
-    storeNodes(root);
-    log("storeNodes has returned");
-
-    // but the children information still needs to be stored
-    log("calling storeChildren function");
-    storeChildren(root);
-    log("storeChildren has returned");
-}
-
-template <typename T>
-void TreeSaver<T>::storeNodes(T * root)
-{
     std::ofstream fout; // for writing to "nodes" file
-
-    // creating a hidden directory in the current directory to store both the files
+    std::ofstream childout; // for writing to "children" file
     fout.open("nodes.dat");
+    childout.open("children.dat");
 
     std::queue<T *> q; // for BFS
 
-    log("starting first traversal");
-
     q.push(root);
+
+    int count = 1; // number of nodes which have been explored till now
 
     // standard BFS implementation
     while(!q.empty())
@@ -53,27 +37,38 @@ void TreeSaver<T>::storeNodes(T * root)
         root = q.front();
         q.pop();
 
-        count++; // one more node dealt with
-
-        // creating entries for this node in the map
-        hash.insert({root, count - 1}); // the index from BFS
-
-        // adding this (count-1) th node to the nodes.dat file
+        // adding this node to the nodes.dat file
         writeNode(fout, root );
 
         // adding its children in the queue
-        if(root->left) q.push(root->left);
-        if(root->right) q.push(root->right);
+        int lc = -1, rc = -1;
+
+        if(root->left)
+        {
+            count++;
+            lc = count - 1;
+            q.push(root->left);
+        }
+        // left child DNE, but lc is already -1, so no need of any modification
+
+        if(root->right)
+        {
+            count++;
+            rc = count - 1;
+            q.push(root->right);
+        }
+
+        childout << lc << " " << rc << "\n";
     }
-    log("first traversal done");
+
     fout.close();
-    return;
+    childout.close();
 }
 
 template <typename T>
 void TreeSaver<T>::writeNode(std::ofstream & fout, T * nodeptr)
 {
-    T temp = *nodeptr;
+    T temp(*nodeptr);
 
     // won't store the actuall address in the file, just making them NULL
     temp.left = NULL;
@@ -81,57 +76,3 @@ void TreeSaver<T>::writeNode(std::ofstream & fout, T * nodeptr)
 
     fout.write((char * ) &temp, sizeof(temp) ); // all the data members of the OG node have been written to the hdd file nodes.dat
 }
-
-template <typename T>
-void TreeSaver<T>::storeChildren(T * root)
-{
-    // need to bfs again, but this time check out the children
-    // if NULL, store -1 in the file,
-    // else find the ID/index of the chidlren using the map "hash"
-
-    std::ofstream fout;
-
-    fout.open("children.dat"); // a hidden file
-
-    std::queue<T *> q;
-
-    log("starting second traversal");
-
-    q.push(root);
-
-    // no need for knowing index of a node,
-    // we are processing nodes in the same order so no need.
-
-    while(!q.empty())
-    {
-        int size = q.size();
-
-        while(size--)
-        {
-            root = q.front();
-            q.pop();
-
-            int lc = - 1, rc = -1;
-
-            if(root->left)
-            {
-                lc = hash.find(root->left)->second;
-                q.push(root->left);
-            }
-            // no need of else, lc is already -1, and we don't need to add lc in queue
-
-            if(root->right)
-            {
-                rc = hash.find(root->right)->second;
-                q.push(root->right);
-            }
-
-            // writing these children indices to the file
-
-            fout << lc << " " << rc << "\n";
-        }
-    }
-    log("second traversal done");
-    fout.close();
-}
-

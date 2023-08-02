@@ -13,27 +13,10 @@
 // a template so that any kind of tree could be saved
 template <typename T> class TreeSaver
 {
-    // a map from addresses to node indices
-    // used for storing the children information in children. file
-    std::unordered_map< T *, int> hash;
-
-
-    // function to traverse the tree in Level order
-    // keep on saving the nodes in the file nodes.dat
-    // as well as map the addresses to indices in hash
-    void storeNodes(T * root);
-
     // just writes the node to the output file "nodes"
     void writeNode(std::ofstream & fout, T * nodeptr);
 
-    // number of nodes which have been saved
-    int count;
-
-    // function to save the children data in children.dat
-    void storeChildren(T * root);
-
 public:
-
     // function to begin saving of the tree on hdd
     void save(T * root);
 };

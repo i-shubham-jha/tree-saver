@@ -36,8 +36,9 @@ int main ()
     TreeRetriever<node> obj2;
     root = obj2.retrieve();
 
-    printf("root: %d, %f\n", root->data1, root->data2);
+    puts("after tree save and retrieve");
 
+    printf("root: %d, %f\n", root->data1, root->data2);
     node * temp = root->left;
     root = root->right;
     printf("LC: %d, %f\n", temp->data1, temp->data2);
