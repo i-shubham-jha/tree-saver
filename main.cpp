@@ -37,6 +37,7 @@ int main ()
     root = obj2.retrieve();
 
     printf("root: %d, %f\n", root->data1, root->data2);
+
     node * temp = root->left;
     root = root->right;
     printf("LC: %d, %f\n", temp->data1, temp->data2);
